@@ -1,5 +1,6 @@
 import java.nio.file.*;
 import java.util.List;
+import java.util.Objects;
 
 public class FileReader {
     public static void main(String[] args) throws Exception {
@@ -39,7 +40,7 @@ public class FileReader {
                 StandardWatchEventKinds.ENTRY_CREATE);
 
         WatchKey key;
-        while ((key = watchService.take()) != null) {
+        while (Objects.nonNull(key = watchService.take())) {
             for (WatchEvent<?> event : key.pollEvents()) {
                 String fileName = event.context().toString();
 
