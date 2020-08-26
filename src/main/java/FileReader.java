@@ -1,6 +1,10 @@
+import java.nio.charset.Charset;
 import java.nio.file.*;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FileReader {
     public static void main(String[] args) throws Exception {
@@ -9,6 +13,11 @@ public class FileReader {
         String inputDir = "in";
         String outputDir = "out";
 
+        String salesmanRegex = "001ç([0-9]+)ç([ a-zA-Z áç]+)ç([-+]?[0-9]*\\.?[0-9]*)";
+        String customerRegex = "002ç([0-9]+)ç([ a-zA-Z áç]+)ç([ a-zA-Z áç]+)";
+        String saleRegex = "003ç([0-9]+)ç(.*)ç(.*)";
+        String itemRegex = "([-+]?[0-9]*\\.?[0-9]*)-([-+]?[0-9]*\\.?[0-9]*)-([-+]?[0-9]*\\.?[0-9]*)";
+
         String processingStatus = "-processing";
 
         Path path = Paths.get(homePath, dataPath, inputDir);
@@ -16,21 +25,6 @@ public class FileReader {
         if (!Files.exists(path)) {
             throw new Exception("Directory doesn't exists");
         }
-
-//        List<String> fileContent = Files.readAllLines(path);
-//
-//        String processingFileName = path.getFileName().toString().concat(processingStatus);
-//
-//        Files.move(path, path.resolveSibling(processingFileName));
-//
-//        Path processingFilePath = Paths.get(homePath, dataPath, inputDir, processingFileName);
-//
-//        fileContent.stream()
-//                .forEach(System.out::println);
-//
-//        Path processedFilePath = Paths.get(homePath, dataPath, outputDir, path.getFileName().toString());
-//
-//        Files.move(processingFilePath, processedFilePath);
 
         WatchService watchService
                 = FileSystems.getDefault().newWatchService();
@@ -54,12 +48,28 @@ public class FileReader {
 
                     Path processingFilePath = Paths.get(homePath, dataPath, inputDir, processingFileName);
 
-                    fileContent.stream()
-                            .forEach(System.out::println);
+                    String salesmanContent = fileContent.stream()
+                            .flatMap(line -> Arrays.stream(line.split("\n")))
+                            .filter(line -> line.contains("001ç"))
+                            .map(line -> {
+                                Pattern salesmanPattern = Pattern.compile(salesmanRegex);
+                                Matcher salesmanMatcher = salesmanPattern.matcher(line);
 
-                    Path processedFilePath = Paths.get(homePath, dataPath, outputDir, fileName);
+                                if (!salesmanMatcher.find()) {
+                                    return "";
+                                }
 
-                    Files.move(processingFilePath, processedFilePath);
+                                return "\t CPF: ".concat(salesmanMatcher.group(1)) +
+                                        "\t Name: ".concat(salesmanMatcher.group(2)) +
+                                        "\t Salary: ".concat(salesmanMatcher.group(3));
+                            })
+                            .map(line -> line.concat("\n"))
+                            .reduce(String::concat)
+                            .get();
+
+                    System.out.println(salesmanContent);
+
+//                    Files.write(Paths.get(homePath, dataPath, outputDir, processingFileName), processedContent.getBytes());
                 }
             }
             key.reset();
