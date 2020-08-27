@@ -1,8 +1,5 @@
-import file.processor.FileProcessor;
 import file.processor.factory.FileProcessorFactory;
 import file.processor.factory.FileProcessorType;
-import file.processor.impl.SalesmanFileProcessor;
-import model.Customer;
 import repository.CustomerRepository;
 import repository.SaleRepository;
 import repository.SalesmanRepository;

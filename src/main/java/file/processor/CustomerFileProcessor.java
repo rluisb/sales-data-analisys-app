@@ -1,6 +1,5 @@
-package file.processor.impl;
+package file.processor;
 
-import file.processor.FileProcessor;
 import model.Customer;
 import repository.CustomerRepository;
 

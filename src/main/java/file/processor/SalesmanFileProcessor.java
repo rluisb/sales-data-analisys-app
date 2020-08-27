@@ -1,13 +1,9 @@
-package file.processor.impl;
+package file.processor;
 
-import file.processor.FileProcessor;
-import model.Sale;
 import model.Salesman;
-import repository.SaleRepository;
 import repository.SalesmanRepository;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

@@ -1,10 +1,9 @@
 package file.processor.factory;
 
 import file.processor.FileProcessor;
-import file.processor.impl.CustomerFileProcessor;
-import file.processor.impl.SaleFileProcessor;
-import file.processor.impl.SalesmanFileProcessor;
-import repository.SalesmanRepository;
+import file.processor.CustomerFileProcessor;
+import file.processor.SaleFileProcessor;
+import file.processor.SalesmanFileProcessor;
 
 import java.util.Objects;
 

@@ -12,7 +12,7 @@ public class SalesmanRepository implements Repository<Salesman> {
     private final Map<String, Salesman> salesmanDatabase;
 
     private SalesmanRepository() {
-        this.salesmanDatabase = new TreeMap<>();
+        this.salesmanDatabase = new HashMap<>();
     }
 
     public static synchronized SalesmanRepository getInstance() {

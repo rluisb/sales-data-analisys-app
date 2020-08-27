@@ -12,7 +12,7 @@ public class CustomerRepository implements Repository<Customer> {
     private final Map<UUID, Customer> customerDatabase;
 
     public CustomerRepository() {
-        this.customerDatabase = new TreeMap<>();
+        this.customerDatabase = new HashMap<>();
     }
 
     public static synchronized CustomerRepository getInstance() {
