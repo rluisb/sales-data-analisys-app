@@ -1,9 +1,8 @@
 package file.reader;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.Objects;
 
 public class FileReader {
@@ -11,6 +10,7 @@ public class FileReader {
     private final String homePath = System.getProperty("user.home");
     private final String dataPath = "data";
     private final String inputDir = "in";
+    private final String processingFileExtension = "-processing";
 
     private static FileReader fileReaderInstance;
     private String fileName;
@@ -31,6 +31,14 @@ public class FileReader {
             throw new IOException("Directory " + getInputPath().toString() + " doesn't exists");
         }
 
+        if (!Files.exists(getPathToFile(fileNameWithExtension))) {
+            return null;
+        }
+
+        if (!canRead(getPathToFile(fileNameWithExtension))) {
+            return null;
+        }
+
         String content = Files.readString(getPathToFile(fileNameWithExtension));
 
         if (Objects.nonNull(content)) {
@@ -47,7 +55,7 @@ public class FileReader {
 
     private void setFileExtension(String fileNameWithExtension) {
         this.fileExtension = fileNameWithExtension
-                .substring(fileNameWithExtension.lastIndexOf(".") - 1);
+                .substring(fileNameWithExtension.lastIndexOf("."));
     }
 
     public String getFileName() {
@@ -65,4 +73,10 @@ public class FileReader {
     public Path getInputPath() {
         return Paths.get(homePath, dataPath, inputDir);
     }
+
+    private boolean canRead(Path path) {
+        File file = new File(path.toString());
+        return file.canRead();
+    }
+
 }

@@ -13,7 +13,10 @@ public class FileWriter {
 
     private final String homePath = System.getProperty("user.home");
     private final String dataPath = "data";
+    private final String inputDir = "in";
     private final String outputDir = "out";
+    private final String processingFileExtension = "-processing";
+    private final String processedFileExtension = "-processed";
 
     private static FileWriter fileWriterInstance;
 
@@ -25,18 +28,19 @@ public class FileWriter {
     }
 
     public void writeFileContent(String fileName, String fileExtension, byte[] content) throws IOException {
-        Path path = Paths.get(homePath, dataPath, outputDir);
+        Path outputPath = Paths.get(homePath, dataPath, outputDir);
 
-        if (!Files.exists(path)) {
-            throw new IOException("Directory " + path.toString() + " doesn't exists");
+        if (!Files.exists(outputPath)) {
+            throw new IOException("Directory " + outputPath.toString() + " doesn't exists");
         }
 
-        Path outputFile = Paths.get(path.toString(),
+        Path outputFile = Paths.get(outputPath.toString(),
                 getProcessedFileName(fileName, fileExtension));
 
         Files.write(outputFile, content);
 
         System.out.println("File saved in path: " + outputFile.toString());
+
     }
 
     private String getProcessedFileName(String fileName, String fileExtension) {

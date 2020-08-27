@@ -6,15 +6,6 @@ import java.util.Objects;
 
 public class FileWatcher {
 
-    private static FileWatcher fileWatcherInstance;
-
-    public static synchronized FileWatcher getInstance() {
-        if (Objects.isNull(fileWatcherInstance)) {
-            fileWatcherInstance = new FileWatcher();
-        }
-        return fileWatcherInstance;
-    }
-
     public WatchService createWatcherService(Path path) throws IOException {
         WatchService watchService
                 = FileSystems.getDefault().newWatchService();
