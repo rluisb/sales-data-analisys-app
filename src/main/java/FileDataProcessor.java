@@ -1,6 +1,7 @@
 import file.processor.factory.FileProcessorFactory;
 import file.processor.factory.FileProcessorType;
 import file.reader.FileReader;
+import file.watcher.FileWatcher;
 import file.writer.FileWriter;
 import model.Report;
 import model.Sale;
@@ -19,18 +20,17 @@ public class FileDataProcessor {
         SalesmanRepository salesmanRepository = SalesmanRepository.getInstance();
         SaleRepository saleRepository = SaleRepository.getInstance();
         CustomerRepository customerRepository = CustomerRepository.getInstance();
+
         FileReader fileReader = FileReader.getInstance();
         FileWriter fileWriter = FileWriter.getInstance();
 
-        ReportService reportService = new ReportService(salesmanRepository, saleRepository, customerRepository);
+        ReportService reportService =
+                new ReportService(salesmanRepository,
+                        saleRepository, customerRepository);
 
-        WatchService watchService
-                = FileSystems.getDefault().newWatchService();
-
-        fileReader.getInputPath()
-                .register(
-                        watchService,
-                        StandardWatchEventKinds.ENTRY_CREATE);
+        WatchService watchService =
+                FileWatcher.getInstance()
+                        .createWatcherService(fileReader.getInputPath());
 
         WatchKey key;
         while (Objects.nonNull(key = watchService.take())) {
@@ -42,7 +42,9 @@ public class FileDataProcessor {
                         .flatMap(content -> Arrays.stream(content.split("\n")))
                         .forEach(line -> {
                             try {
-                                FileProcessorType lineFileProcessorType = FileProcessorType.getFileProcessorType(line);
+                                FileProcessorType lineFileProcessorType =
+                                        FileProcessorType.getFileProcessorType(line);
+
                                 FileProcessorFactory
                                         .getInstance()
                                         .getFileProcessor(lineFileProcessorType)
@@ -52,14 +54,10 @@ public class FileDataProcessor {
                             }
                         });
 
-
-                Report report = reportService.mountReport();
-
                 fileWriter.writeFileContent(
                         fileReader.getFileName(),
                         fileReader.getFileExtension(),
-                        report.getReportInBytes()
-                );
+                        reportService.mountReport().getReportInBytes());
             }
             key.reset();
         }

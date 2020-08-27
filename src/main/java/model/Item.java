@@ -7,9 +7,9 @@ import java.util.stream.Stream;
 
 public class Item {
 
-    private Long id;
-    private Integer amount;
-    private Double price;
+    private final Long id;
+    private final Integer amount;
+    private final Double price;
 
     public Item(Long id, Integer amount, Double price) {
         this.id = Stream.of(id)

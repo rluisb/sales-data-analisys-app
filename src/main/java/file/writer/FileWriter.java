@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class FileWriter {
@@ -39,7 +40,7 @@ public class FileWriter {
     }
 
     private String getProcessedFileName(String fileName, String fileExtension) {
-        long timestamp = Timestamp.valueOf(LocalDate.now().atStartOfDay()).getTime();
+        long timestamp = Timestamp.valueOf(LocalDateTime.now()).getTime();
         return fileName.concat("-").concat(Long.toString(timestamp)).concat(fileExtension);
     }
 }

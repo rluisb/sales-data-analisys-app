@@ -10,9 +10,9 @@ public class Sale {
 
     private static final Double ZERO = Double.valueOf(0);
 
-    private Long id;
-    private String salesmanName;
-    private List<Item> items;
+    private final Long id;
+    private final String salesmanName;
+    private final List<Item> items;
 
     public Sale(Long id, String salesmanName, List<Item> items) {
         this.id = Stream.of(id)

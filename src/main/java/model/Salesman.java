@@ -7,9 +7,9 @@ import java.util.stream.Stream;
 
 public class Salesman {
 
-    private String cpf;
-    private String name;
-    private BigDecimal salary;
+    private final String cpf;
+    private final String name;
+    private final BigDecimal salary;
 
     public Salesman(String cpf, String name, BigDecimal salary) {
         this.cpf = Stream.of(cpf)
@@ -45,10 +45,10 @@ public class Salesman {
 
     @Override
     public String toString() {
-        return "Salesman{" +
-                "cpf='" + cpf + '\'' +
-                ", name='" + name + '\'' +
-                ", salary=" + salary +
-                '}';
+        return "\t{\n" +
+                "\t\tcpf': " + cpf + "',\n" +
+                "\t\tname:'" + name + ",\n" +
+                "\t\tsalary: " + salary + ",\n" +
+                "\t}";
     }
 }

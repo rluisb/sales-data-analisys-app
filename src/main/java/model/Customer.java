@@ -2,14 +2,13 @@ package model;
 
 import java.security.InvalidParameterException;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 public class Customer {
 
-    private String cnpj;
-    private String name;
-    private String businessArea;
+    private final String cnpj;
+    private final String name;
+    private final String businessArea;
 
     public Customer(String cnpj, String name, String businessArea) {
         this.cnpj = Stream.of(cnpj)
