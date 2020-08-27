@@ -3,7 +3,6 @@ package model;
 import java.math.BigDecimal;
 import java.security.InvalidParameterException;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 public class Salesman {

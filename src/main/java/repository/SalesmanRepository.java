@@ -29,8 +29,20 @@ public class SalesmanRepository implements Repository<Salesman> {
                 .collect(Collectors.toUnmodifiableList());
     }
 
+    public Salesman findSalesmanByName(String salesmanName) {
+        return salesmanDatabase.values()
+                .stream()
+                .filter(salesman -> salesman.getName().equals(salesmanName))
+                .findFirst()
+                .get();
+    }
+
     @Override
     public Salesman save(Salesman salesman) {
         return salesmanDatabase.put(salesman.getCpf(), salesman);
+    }
+
+    public int count() {
+        return this.findAll().size();
     }
 }

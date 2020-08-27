@@ -1,12 +1,14 @@
 import file.processor.factory.FileProcessorFactory;
 import file.processor.factory.FileProcessorType;
+import model.Report;
+import model.Sale;
+import model.Salesman;
 import repository.CustomerRepository;
 import repository.SaleRepository;
 import repository.SalesmanRepository;
 
 import java.nio.file.*;
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class FileReader {
@@ -45,7 +47,6 @@ public class FileReader {
 
                 Files.deleteIfExists(pathToFile);
 
-
                 Stream.of(fileContent)
                         .flatMap(content -> Arrays.stream(content.split("\n")))
                         .forEach(line -> {
@@ -59,19 +60,32 @@ public class FileReader {
                             }
                         });
 
-                System.out.println("Customer data:");
-                customerRepository.findAll()
-                        .forEach(System.out::println);
 
-                System.out.println("Sale data:");
-                saleRepository.findAll()
-                        .forEach(System.out::println);
+                int customerAmount = customerRepository.count();
+                int salesmanAmount = salesmanRepository.count();
 
-                System.out.println("Salesman data:");
-                salesmanRepository.findAll()
-                        .forEach(System.out::println);
+                Long mostValuableSaleId = saleRepository.findAll()
+                        .stream()
+                        .max(Comparator.comparing(Sale::getSaleTotalPrice))
+                        .map(Sale::getId)
+                        .get();
 
-//                    Files.write(Paths.get(homePath, dataPath, outputDir, fileName.concat("-Relatory")), salesmanContent);
+                Salesman worstSalesman = saleRepository.findAll()
+                        .stream()
+                        .min(Comparator.comparing(Sale::getSaleTotalPrice))
+                        .map(Sale::getSalesmanName)
+                        .map(salesmanRepository::findSalesmanByName)
+                        .get();
+
+                Report report = new Report(customerAmount, salesmanAmount, mostValuableSaleId, worstSalesman);
+                String reportFileName = fileName.substring(0, fileName.lastIndexOf(".")).concat("-report").concat(fileName.substring(fileName.lastIndexOf(".")));
+
+                Path outputPath = Paths.get(homePath, dataPath, outputDir, reportFileName);
+
+                Files.write(outputPath, report.getReportInBytes());
+
+                System.out.println("File saved in path: " + outputPath.toString());
+
             }
             key.reset();
         }

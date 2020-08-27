@@ -34,6 +34,10 @@ public class CustomerRepository implements Repository<Customer> {
         return customerDatabase.put(generateUniqueKey(), customer);
     }
 
+    public int count() {
+        return this.findAll().size();
+    }
+
     private UUID generateUniqueKey() {
         return UUID.randomUUID();
     }

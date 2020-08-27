@@ -8,6 +8,8 @@ import java.util.stream.Stream;
 
 public class Sale {
 
+    private static final Double ZERO = Double.valueOf(0);
+
     private Long id;
     private String salesmanName;
     private List<Item> items;
@@ -41,6 +43,13 @@ public class Sale {
 
     public List<Item> getItems() {
         return items;
+    }
+
+    public Double getSaleTotalPrice() {
+        return this.items.stream()
+                .map(item -> item.getAmount() * item.getPrice())
+                .reduce(Double::sum)
+                .orElse(ZERO);
     }
 
     @Override
