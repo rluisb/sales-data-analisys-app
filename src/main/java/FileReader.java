@@ -1,24 +1,29 @@
-import java.nio.charset.Charset;
+import file.processor.FileProcessor;
+import file.processor.factory.FileProcessorFactory;
+import file.processor.factory.FileProcessorType;
+import file.processor.impl.SalesmanFileProcessor;
+import model.Customer;
+import repository.CustomerRepository;
+import repository.SaleRepository;
+import repository.SalesmanRepository;
+
 import java.nio.file.*;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 public class FileReader {
     public static void main(String[] args) throws Exception {
+        SalesmanRepository salesmanRepository = SalesmanRepository.getInstance();
+        SaleRepository saleRepository = SaleRepository.getInstance();
+        CustomerRepository customerRepository = CustomerRepository.getInstance();
+
+        FileProcessorFactory fileProcessorFactory = FileProcessorFactory.getInstance();
+
         String homePath = System.getProperty("user.home");
         String dataPath = "data";
         String inputDir = "in";
         String outputDir = "out";
-
-        String salesmanRegex = "001ç([0-9]+)ç([ a-zA-Z áç]+)ç([-+]?[0-9]*\\.?[0-9]*)";
-        String customerRegex = "002ç([0-9]+)ç([ a-zA-Z áç]+)ç([ a-zA-Z áç]+)";
-        String saleRegex = "003ç([0-9]+)ç(.*)ç(.*)";
-        String itemRegex = "([-+]?[0-9]*\\.?[0-9]*)-([-+]?[0-9]*\\.?[0-9]*)-([-+]?[0-9]*\\.?[0-9]*)";
-
-        String processingStatus = "-processing";
 
         Path path = Paths.get(homePath, dataPath, inputDir);
 
@@ -38,39 +43,38 @@ public class FileReader {
             for (WatchEvent<?> event : key.pollEvents()) {
                 String fileName = event.context().toString();
 
-                if (!fileName.contains(processingStatus)) {
-                    Path pathToFile = Paths.get(path.toString(), fileName);
-                    List<String> fileContent = Files.readAllLines(pathToFile);
+                Path pathToFile = Paths.get(path.toString(), fileName);
+                String fileContent = Files.readString(pathToFile);
 
-                    String processingFileName = fileName.concat(processingStatus);
+                Files.deleteIfExists(pathToFile);
 
-                    Files.move(pathToFile, pathToFile.resolveSibling(processingFileName));
 
-                    Path processingFilePath = Paths.get(homePath, dataPath, inputDir, processingFileName);
+                Stream.of(fileContent)
+                        .flatMap(content -> Arrays.stream(content.split("\n")))
+                        .forEach(line -> {
+                            try {
+                                FileProcessorType lineFileProcessorType = FileProcessorType.getFileProcessorType(line);
+                                fileProcessorFactory
+                                        .getFileProcessor(lineFileProcessorType)
+                                        .process(line);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        });
 
-                    String salesmanContent = fileContent.stream()
-                            .flatMap(line -> Arrays.stream(line.split("\n")))
-                            .filter(line -> line.contains("001ç"))
-                            .map(line -> {
-                                Pattern salesmanPattern = Pattern.compile(salesmanRegex);
-                                Matcher salesmanMatcher = salesmanPattern.matcher(line);
+                System.out.println("Customer data:");
+                customerRepository.findAll()
+                        .forEach(System.out::println);
 
-                                if (!salesmanMatcher.find()) {
-                                    return "";
-                                }
+                System.out.println("Sale data:");
+                saleRepository.findAll()
+                        .forEach(System.out::println);
 
-                                return "\t CPF: ".concat(salesmanMatcher.group(1)) +
-                                        "\t Name: ".concat(salesmanMatcher.group(2)) +
-                                        "\t Salary: ".concat(salesmanMatcher.group(3));
-                            })
-                            .map(line -> line.concat("\n"))
-                            .reduce(String::concat)
-                            .get();
+                System.out.println("Salesman data:");
+                salesmanRepository.findAll()
+                        .forEach(System.out::println);
 
-                    System.out.println(salesmanContent);
-
-//                    Files.write(Paths.get(homePath, dataPath, outputDir, processingFileName), processedContent.getBytes());
-                }
+//                    Files.write(Paths.get(homePath, dataPath, outputDir, fileName.concat("-Relatory")), salesmanContent);
             }
             key.reset();
         }
