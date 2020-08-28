@@ -68,6 +68,7 @@ public class FileDataProcessor {
                             reportService.mountReport().getReportInBytes());
                 }
                 key.reset();
+                main(args);
             }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
